@@ -14,7 +14,7 @@ const appointmentUpdateSchema = z.object({
 // GET a specific appointment
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  context: any
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -26,7 +26,7 @@ export async function GET(
       );
     }
 
-    const id = params.id;
+    const id = context.params.id;
     
     const appointment = await db.appointment.findUnique({
       where: { id },
@@ -60,7 +60,7 @@ export async function GET(
 // PATCH (update) a specific appointment
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  context: any
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -72,7 +72,7 @@ export async function PATCH(
       );
     }
 
-    const id = params.id;
+    const id = context.params.id;
     const body = await req.json();
     const { appointmentDate, status, notes } = appointmentUpdateSchema.parse(body);
 
@@ -146,7 +146,7 @@ export async function PATCH(
 // DELETE a specific appointment
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  context: any
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -158,7 +158,7 @@ export async function DELETE(
       );
     }
 
-    const id = params.id;
+    const id = context.params.id;
 
     // Check if appointment exists
     const existingAppointment = await db.appointment.findUnique({

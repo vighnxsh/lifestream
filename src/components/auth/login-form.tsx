@@ -49,7 +49,8 @@ export function LoginForm() {
       // Redirect based on user role
       router.refresh();
       router.push("/");
-    } catch (error) {
+    } catch (err) {
+      console.error("Login error:", err);
       setError("An unexpected error occurred. Please try again.");
       setIsLoading(false);
     }

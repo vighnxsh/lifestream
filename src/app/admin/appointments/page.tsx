@@ -72,7 +72,7 @@ export default function AdminAppointmentsPage() {
         throw new Error("Failed to update appointment status");
       }
 
-      const data = await response.json();
+      const responseData = await response.json(); // Store response data
       
       // Update the appointment in the list
       setAppointments(appointments.map(appointment => 
@@ -133,9 +133,10 @@ export default function AdminAppointmentsPage() {
     return new Date(date) > new Date();
   };
 
-  const isPast = (date: string) => {
-    return new Date(date) < new Date() && !isToday(date);
-  };
+  // Function to check if date is in the past - used for future implementation
+  // const isPast = (date: string) => {
+  //   return new Date(date) < new Date() && !isToday(date);
+  // };
 
   if (loading) {
     return (
@@ -200,7 +201,7 @@ export default function AdminAppointmentsPage() {
       {/* Today's Appointments */}
       {todayAppointments > 0 && (
         <div className="mb-8">
-          <h2 className="text-xl font-bold mb-4">Today's Appointments</h2>
+          <h2 className="text-xl font-bold mb-4">Today&apos;s Appointments</h2>
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">

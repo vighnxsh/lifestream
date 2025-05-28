@@ -22,10 +22,14 @@ const bloodRequestUpdateSchema = z.object({
 
 // GET a specific blood request
 export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: Request
 ) {
   try {
+    // Extract id from URL
+    const url = new URL(request.url);
+    const pathParts = url.pathname.split('/');
+    const id = pathParts[pathParts.length - 1];
+    
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -35,15 +39,16 @@ export async function GET(
       );
     }
 
-    const id = params.id;
-    
+    // Get the blood request without including relations to avoid type errors
     const bloodRequest = await db.bloodRequest.findUnique({
-      where: { id },
-      include: { 
-        requester: { select: { id: true, name: true, email: true } },
-        bloodInventory: true 
-      },
+      where: { id }
     });
+    
+    // If needed, fetch the user separately
+    const user = bloodRequest ? await db.user.findUnique({
+      where: { id: bloodRequest.userId },
+      select: { id: true, name: true, email: true }
+    }) : null;
 
     if (!bloodRequest) {
       return NextResponse.json(
@@ -52,16 +57,17 @@ export async function GET(
       );
     }
 
-    // Regular users can only view their own blood requests
-    if (session.user.role !== "ADMIN" && bloodRequest.requesterId !== session.user.id) {
+    // Regular users can only view their own requests
+    if (session.user.role !== "ADMIN" && bloodRequest.userId !== session.user.id) {
       return NextResponse.json(
-        { error: "You don't have permission to view this blood request" },
+        { error: "Unauthorized. You can only view your own requests." },
         { status: 403 }
       );
     }
 
     return NextResponse.json({ bloodRequest });
-  } catch (error) {
+  } catch (err) {
+    console.error("Error fetching blood request:", err);
     return NextResponse.json(
       { error: "Failed to fetch blood request" },
       { status: 500 }
@@ -71,10 +77,14 @@ export async function GET(
 
 // PATCH (update) a specific blood request
 export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: Request
 ) {
   try {
+    // Extract id from URL
+    const url = new URL(request.url);
+    const pathParts = url.pathname.split('/');
+    const id = pathParts[pathParts.length - 1];
+    
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -84,16 +94,10 @@ export async function PATCH(
       );
     }
 
-    const id = params.id;
-    const body = await req.json();
-    const { 
-      bloodType, quantity, urgency, status, 
-      notes, bloodInventoryId, fulfilledDate 
-    } = bloodRequestUpdateSchema.parse(body);
-
     // Check if blood request exists
     const existingRequest = await db.bloodRequest.findUnique({
       where: { id },
+      include: { user: { select: { id: true, name: true, email: true } } },
     });
 
     if (!existingRequest) {
@@ -103,79 +107,71 @@ export async function PATCH(
       );
     }
 
-    // Regular users can only update their own blood requests and only certain fields
-    if (session.user.role !== "ADMIN") {
-      if (existingRequest.requesterId !== session.user.id) {
-        return NextResponse.json(
-          { error: "You don't have permission to update this blood request" },
-          { status: 403 }
-        );
-      }
-      
-      // Regular users can only update urgency, notes, or cancel their requests
-      const allowedUpdates: any = {};
-      if (urgency) allowedUpdates.urgency = urgency;
-      if (notes !== undefined) allowedUpdates.notes = notes;
-      if (status === "CANCELLED") allowedUpdates.status = status;
-      
-      // Regular users cannot change status to anything other than CANCELLED
-      if (status && status !== "CANCELLED") {
-        return NextResponse.json(
-          { error: "You don't have permission to change the status to " + status },
-          { status: 403 }
-        );
-      }
-
-      const bloodRequest = await db.bloodRequest.update({
-        where: { id },
-        data: allowedUpdates,
-      });
-
-      return NextResponse.json({ 
-        bloodRequest, 
-        message: "Blood request updated successfully" 
-      });
+    // Regular users can only update their own requests and only if they are pending
+    if (
+      session.user.role !== "ADMIN" && 
+      (existingRequest.userId !== session.user.id || existingRequest.status !== "PENDING")
+    ) {
+      return NextResponse.json(
+        { error: "Unauthorized. You can only update your own pending requests." },
+        { status: 403 }
+      );
     }
 
-    // Admin updates
-    const updatedData: any = {};
-    if (bloodType) updatedData.bloodType = bloodType;
-    if (quantity !== undefined) updatedData.quantity = quantity;
-    if (urgency) updatedData.urgency = urgency;
-    if (status) updatedData.status = status;
-    if (notes !== undefined) updatedData.notes = notes;
-    if (bloodInventoryId !== undefined) updatedData.bloodInventoryId = bloodInventoryId;
+    const body = await request.json();
     
-    // If status is changed to FULFILLED, set fulfilledDate
-    if (status === "FULFILLED") {
-      updatedData.fulfilledDate = fulfilledDate ? new Date(fulfilledDate) : new Date();
+    // Parse and validate the request body
+    const validatedData = bloodRequestUpdateSchema.parse(body);
+
+    // Prepare update data
+    const updateData = {};
+    
+    // Regular users can only update certain fields
+    if (session.user.role === "RECIPIENT") {
+      // Recipients can only update urgency, notes, or cancel their request
+      if (validatedData.urgency) updateData.urgency = validatedData.urgency;
+      if (validatedData.notes) updateData.notes = validatedData.notes;
+      if (validatedData.status === "CANCELLED") updateData.status = "CANCELLED";
+    } else if (session.user.role === "ADMIN") {
+      // Admins can update all fields
+      if (validatedData.bloodType) updateData.bloodType = validatedData.bloodType;
+      if (validatedData.quantity) updateData.quantity = validatedData.quantity;
+      if (validatedData.urgency) updateData.urgency = validatedData.urgency;
+      if (validatedData.status) updateData.status = validatedData.status;
+      if (validatedData.notes) updateData.notes = validatedData.notes;
       
-      // If blood inventory is assigned, update its status
-      if (bloodInventoryId) {
+      // Handle fulfillment
+      if (validatedData.status === "FULFILLED") {
+        if (!validatedData.bloodInventoryId) {
+          return NextResponse.json(
+            { error: "Blood inventory ID is required to fulfill a request" },
+            { status: 400 }
+          );
+        }
+        
+        updateData.bloodInventoryId = validatedData.bloodInventoryId;
+        updateData.fulfilledDate = new Date();
+        
+        // Update blood inventory status to USED
         await db.bloodInventory.update({
-          where: { id: bloodInventoryId },
+          where: { id: validatedData.bloodInventoryId },
           data: { status: "USED" },
         });
       }
     }
 
-    const bloodRequest = await db.bloodRequest.update({
+    // Update blood request
+    const updatedRequest = await db.bloodRequest.update({
       where: { id },
-      data: updatedData,
-      include: { bloodInventory: true },
+      data: updateData,
+      include: { user: { select: { id: true, name: true, email: true } } },
     });
 
-    return NextResponse.json({ 
-      bloodRequest, 
-      message: "Blood request updated successfully" 
-    });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.errors }, { status: 400 });
-    }
-    
+    return NextResponse.json({ bloodRequest: updatedRequest });
+  } catch (err) {
+    console.error("Error updating blood request:", err);
     return NextResponse.json(
-      { error: "Something went wrong. Please try again." },
+      { error: "Failed to update blood request" },
       { status: 500 }
     );
   }
@@ -183,10 +179,14 @@ export async function PATCH(
 
 // DELETE a specific blood request
 export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: Request
 ) {
   try {
+    // Extract id from URL
+    const url = new URL(request.url);
+    const pathParts = url.pathname.split('/');
+    const id = pathParts[pathParts.length - 1];
+    
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -195,8 +195,6 @@ export async function DELETE(
         { status: 401 }
       );
     }
-
-    const id = params.id;
 
     // Check if blood request exists
     const existingRequest = await db.bloodRequest.findUnique({
@@ -210,10 +208,13 @@ export async function DELETE(
       );
     }
 
-    // Regular users can only delete their own blood requests
-    if (session.user.role !== "ADMIN" && existingRequest.requesterId !== session.user.id) {
+    // Regular users can only delete their own pending requests
+    if (
+      session.user.role !== "ADMIN" && 
+      (existingRequest.userId !== session.user.id || existingRequest.status !== "PENDING")
+    ) {
       return NextResponse.json(
-        { error: "You don't have permission to delete this blood request" },
+        { error: "Unauthorized. You can only delete your own pending requests." },
         { status: 403 }
       );
     }
@@ -223,12 +224,11 @@ export async function DELETE(
       where: { id },
     });
 
-    return NextResponse.json({ 
-      message: "Blood request deleted successfully" 
-    });
-  } catch (error) {
+    return NextResponse.json({ message: "Blood request deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting blood request:", err);
     return NextResponse.json(
-      { error: "Something went wrong. Please try again." },
+      { error: "Failed to delete blood request" },
       { status: 500 }
     );
   }

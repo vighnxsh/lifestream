@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate } from "@/lib/utils";
 import { motion } from "framer-motion";
-import Link from "next/link";
+
 
 interface BloodRequest {
   id: string;
@@ -221,7 +221,7 @@ export default function RecipientRequestsPage() {
           </div>
           <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100 mb-2">No Blood Requests</h3>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
-            You haven't made any blood requests yet. Click the button above to create your first request.
+            You haven&apos;t made any blood requests yet. Click the button above to create your first request.
           </p>
           <Button 
             onClick={() => setShowRequestModal(true)}

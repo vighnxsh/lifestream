@@ -66,7 +66,8 @@ export function RegisterForm() {
 
       // Redirect to login page on successful registration
       router.push("/login?registered=true");
-    } catch (error) {
+    } catch (err) {
+      console.error("Registration error:", err);
       setError("An unexpected error occurred. Please try again.");
       setIsLoading(false);
     }

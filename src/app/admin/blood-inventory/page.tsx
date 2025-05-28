@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { bloodTypeLabels, statusOptions } from "@/lib/utils";
+import { bloodTypeLabels } from "@/lib/utils";
 import { formatDate } from "@/lib/utils";
 
 interface BloodInventory {

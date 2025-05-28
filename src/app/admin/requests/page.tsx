@@ -36,7 +36,7 @@ export default function AdminBloodRequestsPage() {
   const [error, setError] = useState<string | null>(null);
   const [showFulfillModal, setShowFulfillModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<BloodRequest | null>(null);
-  const [availableInventory, setAvailableInventory] = useState<any[]>([]);
+  const [availableInventory, setAvailableInventory] = useState<{id: string; bloodType: string; quantity: number; expiryDate: string;}[]>([]);
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -74,7 +74,7 @@ export default function AdminBloodRequestsPage() {
         throw new Error("Failed to update request status");
       }
 
-      const data = await response.json();
+      await response.json(); // Response data not needed
       
       // Update the request in the list
       setRequests(requests.map(request => 

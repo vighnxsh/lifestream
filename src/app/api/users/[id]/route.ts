@@ -2,23 +2,34 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { hash } from "bcryptjs";
 import { z } from "zod";
 
 // Schema for validation
 const userUpdateSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters" }).optional(),
-  email: z.string().email({ message: "Invalid email address" }).optional(),
-  password: z.string().min(8, { message: "Password must be at least 8 characters" }).optional(),
+  name: z.string().min(2).optional(),
+  email: z.string().email().optional(),
   role: z.enum(["ADMIN", "DONOR", "RECIPIENT"]).optional(),
+  bloodType: z.enum([
+    "A_POSITIVE", "A_NEGATIVE", 
+    "B_POSITIVE", "B_NEGATIVE", 
+    "AB_POSITIVE", "AB_NEGATIVE", 
+    "O_POSITIVE", "O_NEGATIVE"
+  ]).optional(),
+  address: z.string().optional(),
+  phone: z.string().optional(),
+  dateOfBirth: z.string().datetime().optional(),
 });
 
 // GET a specific user
 export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: Request
 ) {
   try {
+    // Extract id from URL
+    const url = new URL(request.url);
+    const pathParts = url.pathname.split('/');
+    const id = pathParts[pathParts.length - 1];
+    
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -28,12 +39,10 @@ export async function GET(
       );
     }
 
-    const id = params.id;
-    
-    // Users can view their own profile, admins can view any profile
-    if (session.user.id !== id && session.user.role !== "ADMIN") {
+    // Regular users can only view their own profile
+    if (session.user.role !== "ADMIN" && session.user.id !== id) {
       return NextResponse.json(
-        { error: "You don't have permission to view this user" },
+        { error: "Unauthorized. You can only view your own profile." },
         { status: 403 }
       );
     }
@@ -45,39 +54,12 @@ export async function GET(
         name: true,
         email: true,
         role: true,
+        bloodType: true,
+        address: true,
+        phone: true,
+        dateOfBirth: true,
         createdAt: true,
         updatedAt: true,
-        // Include related records if admin
-        ...(session.user.role === "ADMIN" ? {
-          donations: {
-            select: {
-              id: true,
-              donationDate: true,
-              status: true,
-            },
-            orderBy: { donationDate: "desc" },
-            take: 5,
-          },
-          appointments: {
-            select: {
-              id: true,
-              appointmentDate: true,
-              status: true,
-            },
-            orderBy: { appointmentDate: "desc" },
-            take: 5,
-          },
-          bloodRequests: {
-            select: {
-              id: true,
-              bloodType: true,
-              status: true,
-              requestDate: true,
-            },
-            orderBy: { requestDate: "desc" },
-            take: 5,
-          },
-        } : {}),
       },
     });
 
@@ -89,7 +71,8 @@ export async function GET(
     }
 
     return NextResponse.json({ user });
-  } catch (error) {
+  } catch (err) {
+    console.error("Error fetching user:", err);
     return NextResponse.json(
       { error: "Failed to fetch user" },
       { status: 500 }
@@ -99,10 +82,14 @@ export async function GET(
 
 // PATCH (update) a specific user
 export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: Request
 ) {
   try {
+    // Extract id from URL
+    const url = new URL(request.url);
+    const pathParts = url.pathname.split('/');
+    const id = pathParts[pathParts.length - 1];
+    
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -112,18 +99,13 @@ export async function PATCH(
       );
     }
 
-    const id = params.id;
-    
-    // Users can update their own profile, admins can update any profile
-    if (session.user.id !== id && session.user.role !== "ADMIN") {
+    // Regular users can only update their own profile
+    if (session.user.role !== "ADMIN" && session.user.id !== id) {
       return NextResponse.json(
-        { error: "You don't have permission to update this user" },
+        { error: "Unauthorized. You can only update your own profile." },
         { status: 403 }
       );
     }
-
-    const body = await req.json();
-    const { name, email, password, role } = userUpdateSchema.parse(body);
 
     // Check if user exists
     const existingUser = await db.user.findUnique({
@@ -137,59 +119,56 @@ export async function PATCH(
       );
     }
 
+    const body = await request.json();
+    
+    // Parse and validate the request body
+    const validatedData = userUpdateSchema.parse(body);
+
     // Regular users cannot change their role
-    if (role && session.user.role !== "ADMIN") {
+    if (session.user.role !== "ADMIN" && validatedData.role) {
       return NextResponse.json(
-        { error: "You don't have permission to change roles" },
+        { error: "Unauthorized. You cannot change your role." },
         { status: 403 }
       );
     }
 
     // If email is being updated, check if it's already in use
-    if (email && email !== existingUser.email) {
+    if (validatedData.email && validatedData.email !== existingUser.email) {
       const emailExists = await db.user.findUnique({
-        where: { email },
+        where: { email: validatedData.email },
       });
 
       if (emailExists) {
         return NextResponse.json(
-          { error: "Email is already in use" },
-          { status: 409 }
+          { error: "Email already in use" },
+          { status: 400 }
         );
       }
     }
 
     // Update user
-    const updatedData: any = {};
-    if (name) updatedData.name = name;
-    if (email) updatedData.email = email;
-    if (password) updatedData.password = await hash(password, 10);
-    if (role) updatedData.role = role;
-
-    const user = await db.user.update({
+    const updatedUser = await db.user.update({
       where: { id },
-      data: updatedData,
+      data: validatedData,
       select: {
         id: true,
         name: true,
         email: true,
         role: true,
+        bloodType: true,
+        address: true,
+        phone: true,
+        dateOfBirth: true,
         createdAt: true,
         updatedAt: true,
       },
     });
 
-    return NextResponse.json({ 
-      user, 
-      message: "User updated successfully" 
-    });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.errors }, { status: 400 });
-    }
-    
+    return NextResponse.json({ user: updatedUser });
+  } catch (err) {
+    console.error("Error updating user:", err);
     return NextResponse.json(
-      { error: "Something went wrong. Please try again." },
+      { error: "Failed to update user" },
       { status: 500 }
     );
   }
@@ -197,21 +176,30 @@ export async function PATCH(
 
 // DELETE a specific user (admin only)
 export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: Request
 ) {
   try {
+    // Extract id from URL
+    const url = new URL(request.url);
+    const pathParts = url.pathname.split('/');
+    const id = pathParts[pathParts.length - 1];
+    
     const session = await getServerSession(authOptions);
 
-    // Only admins can delete users
-    if (!session || session.user.role !== "ADMIN") {
+    if (!session) {
       return NextResponse.json(
-        { error: "Unauthorized. Only admins can delete users" },
-        { status: 403 }
+        { error: "Unauthorized. Please sign in." },
+        { status: 401 }
       );
     }
 
-    const id = params.id;
+    // Only admins can delete users
+    if (session.user.role !== "ADMIN") {
+      return NextResponse.json(
+        { error: "Unauthorized. Only admins can delete users." },
+        { status: 403 }
+      );
+    }
 
     // Check if user exists
     const existingUser = await db.user.findUnique({
@@ -222,14 +210,6 @@ export async function DELETE(
       return NextResponse.json(
         { error: "User not found" },
         { status: 404 }
-      );
-    }
-
-    // Prevent deleting your own account
-    if (id === session.user.id) {
-      return NextResponse.json(
-        { error: "You cannot delete your own account" },
-        { status: 400 }
       );
     }
 
@@ -238,12 +218,11 @@ export async function DELETE(
       where: { id },
     });
 
-    return NextResponse.json({ 
-      message: "User deleted successfully" 
-    });
-  } catch (error) {
+    return NextResponse.json({ message: "User deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting user:", err);
     return NextResponse.json(
-      { error: "Something went wrong. Please try again." },
+      { error: "Failed to delete user" },
       { status: 500 }
     );
   }

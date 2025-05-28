@@ -19,11 +19,13 @@ const bloodInventoryUpdateSchema = z.object({
 
 // GET a specific blood inventory item
 export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: Request
 ) {
   try {
-    const id = params.id;
+    // Extract id from URL
+    const url = new URL(request.url);
+    const pathParts = url.pathname.split('/');
+    const id = pathParts[pathParts.length - 1];
     
     const bloodInventory = await db.bloodInventory.findUnique({
       where: { id },
@@ -37,7 +39,8 @@ export async function GET(
     }
 
     return NextResponse.json({ bloodInventory });
-  } catch (error) {
+  } catch (err) {
+    console.error("Error fetching blood inventory:", err);
     return NextResponse.json(
       { error: "Failed to fetch blood inventory" },
       { status: 500 }
@@ -47,10 +50,14 @@ export async function GET(
 
 // PATCH (update) a specific blood inventory item (admin only)
 export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: Request
 ) {
   try {
+    // Extract id from URL
+    const url = new URL(request.url);
+    const pathParts = url.pathname.split('/');
+    const id = pathParts[pathParts.length - 1];
+    
     const session = await getServerSession(authOptions);
 
     // Check if user is authenticated and is an admin
@@ -61,8 +68,7 @@ export async function PATCH(
       );
     }
 
-    const id = params.id;
-    const body = await req.json();
+    const body = await request.json();
     const { bloodType, quantity, expiryDate, status } = bloodInventoryUpdateSchema.parse(body);
 
     // Check if blood inventory exists
@@ -78,28 +84,21 @@ export async function PATCH(
     }
 
     // Update blood inventory
-    const updatedData: any = {};
-    if (bloodType) updatedData.bloodType = bloodType;
-    if (quantity !== undefined) updatedData.quantity = quantity;
-    if (expiryDate) updatedData.expiryDate = new Date(expiryDate);
-    if (status) updatedData.status = status;
-
-    const bloodInventory = await db.bloodInventory.update({
+    const updatedInventory = await db.bloodInventory.update({
       where: { id },
-      data: updatedData,
+      data: {
+        ...(bloodType && { bloodType }),
+        ...(quantity !== undefined && { quantity }),
+        ...(expiryDate && { expiryDate: new Date(expiryDate) }),
+        ...(status && { status }),
+      },
     });
 
-    return NextResponse.json({ 
-      bloodInventory, 
-      message: "Blood inventory updated successfully" 
-    });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.errors }, { status: 400 });
-    }
-    
+    return NextResponse.json({ bloodInventory: updatedInventory });
+  } catch (err) {
+    console.error("Error updating blood inventory:", err);
     return NextResponse.json(
-      { error: "Something went wrong. Please try again." },
+      { error: "Failed to update blood inventory" },
       { status: 500 }
     );
   }
@@ -107,10 +106,14 @@ export async function PATCH(
 
 // DELETE a specific blood inventory item (admin only)
 export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: Request
 ) {
   try {
+    // Extract id from URL
+    const url = new URL(request.url);
+    const pathParts = url.pathname.split('/');
+    const id = pathParts[pathParts.length - 1];
+    
     const session = await getServerSession(authOptions);
 
     // Check if user is authenticated and is an admin
@@ -120,8 +123,6 @@ export async function DELETE(
         { status: 403 }
       );
     }
-
-    const id = params.id;
 
     // Check if blood inventory exists
     const existingInventory = await db.bloodInventory.findUnique({
@@ -140,12 +141,11 @@ export async function DELETE(
       where: { id },
     });
 
-    return NextResponse.json({ 
-      message: "Blood inventory deleted successfully" 
-    });
-  } catch (error) {
+    return NextResponse.json({ message: "Blood inventory deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting blood inventory:", err);
     return NextResponse.json(
-      { error: "Something went wrong. Please try again." },
+      { error: "Failed to delete blood inventory" },
       { status: 500 }
     );
   }
