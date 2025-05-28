@@ -62,7 +62,7 @@ export default function BloodInventoryPage() {
     <div className="container mx-auto py-16 px-4 max-w-6xl">
       <div className="mb-12 text-center">
         <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">Blood Inventory</h1>
-        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+        <p className="text-lg text-gray-600 dark:text-black max-w-2xl mx-auto">
           Current blood supply levels and availability. Our inventory is updated in real-time to reflect donations and usage.
         </p>
       </div>
@@ -70,7 +70,7 @@ export default function BloodInventoryPage() {
       {loading ? (
         <div className="text-center py-16">
           <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-red-600 border-r-transparent"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading inventory data...</p>
+          <p className="mt-4 text-gray-600 dark:text-black">Loading inventory data...</p>
         </div>
       ) : error ? (
         <div className="bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded-lg shadow-sm my-8">
@@ -146,7 +146,7 @@ export default function BloodInventoryPage() {
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Need Blood?</h2>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-gray-600 dark:text-black">
                     If you or someone you know needs blood, please register as a recipient and submit a blood request.
                   </p>
                 </div>
@@ -180,7 +180,7 @@ export default function BloodInventoryPage() {
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Become a Donor</h2>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-gray-600 dark:text-black">
                     Your donation can save up to 3 lives! Healthy individuals who are at least 18 years old and weigh at least 110 pounds may be eligible to donate blood.
                   </p>
                 </div>
@@ -236,15 +236,15 @@ export default function BloodInventoryPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center">
                 <div className="text-red-600 text-4xl font-bold mb-2">4.5M</div>
-                <p className="text-gray-600 dark:text-gray-400">Americans need blood transfusions each year</p>
+                <p className="text-gray-600 dark:text-black">Americans need blood transfusions each year</p>
               </div>
               <div className="text-center">
                 <div className="text-red-600 text-4xl font-bold mb-2">3</div>
-                <p className="text-gray-600 dark:text-gray-400">Lives saved with each donation</p>
+                <p className="text-gray-600 dark:text-black">Lives saved with each donation</p>
               </div>
               <div className="text-center">
                 <div className="text-red-600 text-4xl font-bold mb-2">10-12</div>
-                <p className="text-gray-600 dark:text-gray-400">Minutes is all it takes to donate</p>
+                <p className="text-gray-600 dark:text-black">Minutes is all it takes to donate</p>
               </div>
             </div>
           </motion.div>

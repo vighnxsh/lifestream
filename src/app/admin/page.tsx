@@ -108,7 +108,7 @@ export default function AdminDashboard() {
     return (
       <div className="flex flex-col items-center justify-center h-[70vh]">
         <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-red-600 border-r-transparent"></div>
-        <span className="mt-4 text-gray-600 dark:text-gray-400 font-medium">Loading dashboard data...</span>
+        <span className="mt-4 text-gray-600 dark:text-black font-medium">Loading dashboard data...</span>
       </div>
     );
   }
@@ -127,7 +127,7 @@ export default function AdminDashboard() {
         
         {stats && (
           <div className="mt-6 text-center">
-            <p className="text-gray-600 dark:text-gray-400 mb-4">Showing fallback data. Some features may be limited.</p>
+            <p className="text-gray-600 dark:text-black mb-4">Showing fallback data. Some features may be limited.</p>
             <Button 
               onClick={() => window.location.reload()}
               className="bg-red-600 hover:bg-red-700 text-white"
@@ -155,7 +155,7 @@ export default function AdminDashboard() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-gray-600 dark:text-gray-400"
+          className="text-gray-600 dark:text-black"
         >
           Overview of blood bank operations, inventory, and user statistics
         </motion.p>
@@ -181,15 +181,15 @@ export default function AdminDashboard() {
               <div className="flex justify-between items-center">
                 <div>
                   <p className="text-3xl font-bold text-gray-800 dark:text-gray-200">{stats.users.total}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Total Users</p>
+                  <p className="text-sm text-gray-500 dark:text-black">Total Users</p>
                 </div>
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400 mr-2">Donors:</span>
+                    <span className="text-sm text-gray-600 dark:text-black mr-2">Donors:</span>
                     <span className="font-semibold text-blue-600 dark:text-blue-400">{stats.users.donors}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400 mr-2">Recipients:</span>
+                    <span className="text-sm text-gray-600 dark:text-black mr-2">Recipients:</span>
                     <span className="font-semibold text-green-600 dark:text-green-400">{stats.users.recipients}</span>
                   </div>
                 </div>
@@ -200,7 +200,7 @@ export default function AdminDashboard() {
                   style={{ width: `${(stats.users.donors / stats.users.total) * 100}%` }}
                 ></div>
               </div>
-              <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <div className="flex justify-between text-xs text-gray-500 dark:text-black mt-1">
                 <span>Donors: {Math.round((stats.users.donors / stats.users.total) * 100)}%</span>
                 <span>Recipients: {Math.round((stats.users.recipients / stats.users.total) * 100)}%</span>
               </div>
@@ -234,13 +234,13 @@ export default function AdminDashboard() {
               <div className="flex justify-between items-center">
                 <div>
                   <p className="text-3xl font-bold text-gray-800 dark:text-gray-200">{stats.bloodInventory.available}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Available Units</p>
+                  <p className="text-sm text-gray-500 dark:text-black">Available Units</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Total: {stats.bloodInventory.total} units</p>
+                  <p className="text-sm text-gray-600 dark:text-black">Total: {stats.bloodInventory.total} units</p>
                   <div className="flex items-center justify-end mt-1">
                     <div className="w-3 h-3 rounded-full mr-1 bg-red-500"></div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-gray-500 dark:text-black">
                       {Math.round((stats.bloodInventory.available / stats.bloodInventory.total) * 100)}% available
                     </p>
                   </div>
@@ -259,7 +259,7 @@ export default function AdminDashboard() {
                 {Object.entries(stats.bloodInventory.byType).slice(0, 4).map(([type, count]) => (
                   <div key={type} className="text-center">
                     <div className="text-sm font-bold text-red-600 dark:text-red-400">{bloodTypeLabels[type]}</div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">{count}</div>
+                    <div className="text-xs text-gray-600 dark:text-black">{count}</div>
                   </div>
                 ))}
               </div>
@@ -299,7 +299,7 @@ export default function AdminDashboard() {
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Pending Requests</span>
+                      <span className="text-sm text-gray-600 dark:text-black">Pending Requests</span>
                       <span className="font-semibold text-red-600 dark:text-red-400">{stats.requests.pending}</span>
                     </div>
                     <div className="w-full bg-gray-200 dark:bg-gray-700 h-1 rounded-full mt-1">
@@ -319,7 +319,7 @@ export default function AdminDashboard() {
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Today&apos;s Appointments</span>
+                      <span className="text-sm text-gray-600 dark:text-black">Today&apos;s Appointments</span>
                       <span className="font-semibold text-blue-600 dark:text-blue-400">{stats.appointments.today}</span>
                     </div>
                     <div className="w-full bg-gray-200 dark:bg-gray-700 h-1 rounded-full mt-1">
@@ -339,7 +339,7 @@ export default function AdminDashboard() {
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Scheduled Donations</span>
+                      <span className="text-sm text-gray-600 dark:text-black">Scheduled Donations</span>
                       <span className="font-semibold text-green-600 dark:text-green-400">{stats.donations.scheduled}</span>
                     </div>
                     <div className="w-full bg-gray-200 dark:bg-gray-700 h-1 rounded-full mt-1">
@@ -433,7 +433,7 @@ export default function AdminDashboard() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-lg font-semibold flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-600 dark:text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               Recent Activity
@@ -458,12 +458,12 @@ export default function AdminDashboard() {
                 </div>
                 <div className="flex-1">
                   <p className="font-medium text-gray-900 dark:text-gray-100">New donation recorded</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">John Doe donated 1 unit of O+ blood</p>
+                  <p className="text-sm text-gray-600 dark:text-black">John Doe donated 1 unit of O+ blood</p>
                   <div className="flex items-center mt-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400 dark:text-gray-500 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-black dark:text-gray-500 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <p className="text-xs text-gray-400 dark:text-gray-500">10 minutes ago</p>
+                    <p className="text-xs text-black dark:text-gray-500">10 minutes ago</p>
                   </div>
                 </div>
               </motion.div>
@@ -481,12 +481,12 @@ export default function AdminDashboard() {
                 </div>
                 <div className="flex-1">
                   <p className="font-medium text-gray-900 dark:text-gray-100">Appointment scheduled</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Jane Smith scheduled a donation for tomorrow</p>
+                  <p className="text-sm text-gray-600 dark:text-black">Jane Smith scheduled a donation for tomorrow</p>
                   <div className="flex items-center mt-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400 dark:text-gray-500 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-black dark:text-gray-500 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <p className="text-xs text-gray-400 dark:text-gray-500">1 hour ago</p>
+                    <p className="text-xs text-black dark:text-gray-500">1 hour ago</p>
                   </div>
                 </div>
               </motion.div>
@@ -504,12 +504,12 @@ export default function AdminDashboard() {
                 </div>
                 <div className="flex-1">
                   <p className="font-medium text-gray-900 dark:text-gray-100">Blood request received</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Memorial Hospital requested 3 units of AB-</p>
+                  <p className="text-sm text-gray-600 dark:text-black">Memorial Hospital requested 3 units of AB-</p>
                   <div className="flex items-center mt-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400 dark:text-gray-500 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-black dark:text-gray-500 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <p className="text-xs text-gray-400 dark:text-gray-500">3 hours ago</p>
+                    <p className="text-xs text-black dark:text-gray-500">3 hours ago</p>
                   </div>
                 </div>
               </motion.div>
@@ -527,12 +527,12 @@ export default function AdminDashboard() {
                 </div>
                 <div className="flex-1">
                   <p className="font-medium text-gray-900 dark:text-gray-100">New user registered</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Michael Johnson registered as a donor</p>
+                  <p className="text-sm text-gray-600 dark:text-black">Michael Johnson registered as a donor</p>
                   <div className="flex items-center mt-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400 dark:text-gray-500 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-black dark:text-gray-500 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <p className="text-xs text-gray-400 dark:text-gray-500">5 hours ago</p>
+                    <p className="text-xs text-black dark:text-gray-500">5 hours ago</p>
                   </div>
                 </div>
               </motion.div>

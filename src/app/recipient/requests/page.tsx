@@ -146,7 +146,7 @@ export default function RecipientRequestsPage() {
     return (
       <div className="flex flex-col items-center justify-center h-[70vh]">
         <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-red-600 border-r-transparent"></div>
-        <span className="mt-4 text-gray-600 dark:text-gray-400 font-medium">Loading your blood requests...</span>
+        <span className="mt-4 text-gray-600 dark:text-black font-medium">Loading your blood requests...</span>
       </div>
     );
   }
@@ -181,7 +181,7 @@ export default function RecipientRequestsPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-gray-600 dark:text-gray-400"
+          className="text-gray-600 dark:text-black"
         >
           Manage your blood requests and track their status
         </motion.p>
@@ -192,7 +192,7 @@ export default function RecipientRequestsPage() {
           <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
             Your Requests
           </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-600 dark:text-black">
             {requests?.length || 0} {(requests?.length || 0) === 1 ? 'request' : 'requests'} found
           </p>
         </div>
@@ -215,12 +215,12 @@ export default function RecipientRequestsPage() {
           className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 text-center"
         >
           <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-black dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
             </svg>
           </div>
           <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100 mb-2">No Blood Requests</h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
+          <p className="text-gray-600 dark:text-black mb-6">
             You haven&apos;t made any blood requests yet. Click the button above to create your first request.
           </p>
           <Button 
@@ -270,13 +270,13 @@ export default function RecipientRequestsPage() {
                 <CardContent>
                   <div className="space-y-3">
                     <div className="flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500 dark:text-black mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                       </svg>
                       <span className="text-sm text-gray-700 dark:text-gray-300">{request.hospitalName}</span>
                     </div>
                     <div className="flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500 dark:text-black mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
                       <span className="text-sm text-gray-700 dark:text-gray-300">
@@ -288,7 +288,7 @@ export default function RecipientRequestsPage() {
                       </span>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                      <p className="text-sm text-gray-600 dark:text-black mt-2">
                         <span className="font-medium">Reason:</span> {request.reason}
                       </p>
                     </div>
@@ -338,7 +338,7 @@ export default function RecipientRequestsPage() {
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white">New Blood Request</h3>
                 <button 
                   onClick={() => setShowRequestModal(false)}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  className="text-gray-500 hover:text-gray-700 dark:text-black dark:hover:text-gray-200"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
