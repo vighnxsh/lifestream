@@ -1,21 +1,77 @@
 @import "tailwindcss";
 
 :root {
+  /* Base colors */
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* Primary colors */
+  --primary: #e53e3e; /* Blood red */
+  --primary-hover: #c53030;
+  --primary-foreground: #ffffff;
+  
+  /* Secondary colors */
+  --secondary: #2b6cb0; /* Medical blue */
+  --secondary-hover: #2c5282;
+  --secondary-foreground: #ffffff;
+  
+  /* Accent colors */
+  --accent: #38a169; /* Success green */
+  --accent-hover: #2f855a;
+  --accent-foreground: #ffffff;
+  
+  /* UI colors */
+  --card: #ffffff;
+  --card-foreground: #171717;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: rgba(229, 62, 62, 0.3);
+  
+  /* Status colors */
+  --success: #38a169;
+  --warning: #d69e2e;
+  --danger: #e53e3e;
+  --info: #3182ce;
+  
+  /* Typography */
+  --font-sans: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  
+  /* Radius */
+  --radius: 0.5rem;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0f172a; /* Dark blue background */
+    --foreground: #f8fafc;
+    
+    --primary: #f56565; /* Lighter red for dark mode */
+    --primary-hover: #e53e3e;
+    
+    --secondary: #4299e1;
+    --secondary-hover: #3182ce;
+    
+    --accent: #48bb78;
+    --accent-hover: #38a169;
+    
+    --card: #1e293b;
+    --card-foreground: #f8fafc;
+    --border: #334155;
+    --input: #334155;
+    --ring: rgba(245, 101, 101, 0.3);
   }
 }
 
