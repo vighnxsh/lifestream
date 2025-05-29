@@ -57,7 +57,7 @@ export default function RecipientRequestsPage() {
         }
         
         const data = await response.json();
-        setRequests(data.requests);
+        setRequests(data.bloodRequests);
       } catch (error) {
         setError("Error loading blood requests. Please try again later.");
         console.error(error);
@@ -85,8 +85,7 @@ export default function RecipientRequestsPage() {
           bloodType,
           quantity,
           urgency,
-          hospitalName,
-          reason,
+          notes: `${hospitalName} - ${reason}`,
         }),
       });
 
@@ -97,7 +96,7 @@ export default function RecipientRequestsPage() {
       const data = await response.json();
       
       // Add the new request to the list
-      setRequests([...requests, data.request]);
+      setRequests([...requests, data.bloodRequest]);
       
       // Reset form and close modal
       setBloodType("");
